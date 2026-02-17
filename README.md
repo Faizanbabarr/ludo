@@ -1,4 +1,4 @@
-# Ludo
+# Roll Home
 
 Cross-platform Ludo game: **Web** (Netlify) · **Android** (Google Play / APK) · **iOS** (App Store later).
 
@@ -29,7 +29,7 @@ Open the URL in the browser (and on your phone if on same Wi‑Fi).
 
 1. Push code to GitHub.
 2. Open the repo → **Actions** → run **Build Android APK**.
-3. When finished, download the **ludo-debug-apk** artifact and install on device or Game Loop emulator.
+3. When finished, download the **roll-home-debug-apk** artifact and install on device or Game Loop emulator.
 
 ## Netlify
 

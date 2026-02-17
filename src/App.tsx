@@ -4,7 +4,7 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Ludo</h1>
+        <h1>Roll Home</h1>
         <p className="tagline">Web · Android · iOS</p>
       </header>
       <main className="main">
