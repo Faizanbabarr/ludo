@@ -29,17 +29,13 @@ export function Dice({ value, rolling = false, size = 48 }: DiceProps) {
   const dots = DOTS[display] ?? DOTS[1]
   return (
     <div
-      className="dice"
-      style={{
-        width: size,
-        height: size,
-        opacity: rolling ? 0.9 : 1,
-      }}
+      className={`dice ${rolling ? 'dice-rolling' : ''}`}
+      style={{ width: size, height: size }}
     >
       <svg viewBox="0 0 1 1" width={size} height={size}>
-        <rect width="1" height="1" rx="0.15" fill="#fff" stroke="#333" strokeWidth="0.04" />
+        <rect width="1" height="1" rx="0.15" fill="rgba(255,255,255,0.95)" stroke="rgba(255,255,255,0.3)" strokeWidth="0.04" />
         {dots.map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y} r="0.12" fill="#222" />
+          <circle key={i} cx={x} cy={y} r="0.12" fill="#1e293b" />
         ))}
       </svg>
     </div>

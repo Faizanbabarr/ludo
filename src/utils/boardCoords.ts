@@ -28,24 +28,25 @@ export function getTokenCoords(
   pathPosition: number,
   tokenOffset: number
 ): { x: number; y: number } {
-  const cell = 2.2
   const off = (tokenOffset - 1.5) * 2
   if (pathPosition === PATH_BASE) {
+    /* Base rects are at (16,51), (51,51), (51,16), (16,16) size 15 - centers below */
     const baseCenters: Record<PlayerId, { x: number; y: number }> = {
-      0: { x: 25, y: 75 },
-      1: { x: 75, y: 75 },
-      2: { x: 75, y: 25 },
-      3: { x: 25, y: 25 },
+      0: { x: 23.5, y: 58.5 },
+      1: { x: 58.5, y: 58.5 },
+      2: { x: 58.5, y: 23.5 },
+      3: { x: 23.5, y: 23.5 },
     }
+    const half = 3.75
     const baseOff: Record<PlayerId, { dx: number; dy: number }[]> = {
-      0: [{ dx: 0, dy: 0 }, { dx: cell, dy: 0 }, { dx: 0, dy: cell }, { dx: cell, dy: cell }],
-      1: [{ dx: 0, dy: 0 }, { dx: -cell, dy: 0 }, { dx: 0, dy: cell }, { dx: -cell, dy: cell }],
-      2: [{ dx: 0, dy: 0 }, { dx: -cell, dy: 0 }, { dx: 0, dy: -cell }, { dx: -cell, dy: -cell }],
-      3: [{ dx: 0, dy: 0 }, { dx: cell, dy: 0 }, { dx: 0, dy: -cell }, { dx: cell, dy: -cell }],
+      0: [{ dx: -half, dy: -half }, { dx: half, dy: -half }, { dx: -half, dy: half }, { dx: half, dy: half }],
+      1: [{ dx: -half, dy: -half }, { dx: half, dy: -half }, { dx: -half, dy: half }, { dx: half, dy: half }],
+      2: [{ dx: -half, dy: -half }, { dx: half, dy: -half }, { dx: -half, dy: half }, { dx: half, dy: half }],
+      3: [{ dx: -half, dy: -half }, { dx: half, dy: -half }, { dx: -half, dy: half }, { dx: half, dy: half }],
     }
     const c = baseCenters[player]
-    const o = baseOff[player][tokenOffset]
-    return { x: c.x + o.dx, y: c.y + o.dy }
+    const d = baseOff[player][tokenOffset]
+    return { x: c.x + d.dx, y: c.y + d.dy }
   }
   if (pathPosition === PATH_DONE) {
     const homeCenters: Record<PlayerId, { x: number; y: number }> = {

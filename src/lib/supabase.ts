@@ -1,10 +1,15 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-const url = import.meta.env.VITE_SUPABASE_URL ?? ''
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY ?? ''
+let supabase: SupabaseClient | null = null
+try {
+  const url = import.meta.env.VITE_SUPABASE_URL ?? ''
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY ?? ''
+  if (url && key) supabase = createClient(url, key)
+} catch {
+  supabase = null
+}
 
-export const supabase = url && key ? createClient(url, key) : null
-
+export { supabase }
 export function hasSupabase(): boolean {
   return supabase !== null
 }
