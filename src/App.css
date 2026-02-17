@@ -4,13 +4,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 0.5rem;
   box-sizing: border-box;
 }
 
 .header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .header h1 {
@@ -29,21 +29,242 @@
   text-align: center;
 }
 
-.placeholder {
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 1.5rem 2rem;
+/* Menu */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   max-width: 320px;
 }
 
-.placeholder p {
-  margin: 0.5rem 0;
+.menu-label {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
 }
 
-.placeholder p:first-child {
-  margin-top: 0;
+.player-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
 }
 
-.placeholder p:last-child {
-  margin-bottom: 0;
+.btn-players {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn-players.active {
+  border-color: #43a047;
+  background: rgba(67, 160, 71, 0.3);
+}
+
+.btn-start {
+  padding: 0.75rem 2rem;
+  border-radius: 12px;
+  border: none;
+  background: #43a047;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.btn-start:hover {
+  background: #388e3c;
+}
+
+.menu-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.btn-start.secondary {
+  background: rgba(255, 255, 255, 0.15);
+  margin-top: 0.5rem;
+}
+
+.btn-start.secondary:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.btn-back-inline {
+  margin-top: 1rem;
+  padding: 0.4rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: inherit;
+  opacity: 0.8;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.join-row {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  margin: 0.75rem 0;
+}
+
+.input-code {
+  width: 6ch;
+  padding: 0.5rem;
+  font-size: 1.1rem;
+  letter-spacing: 0.2em;
+  text-align: center;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+}
+
+.btn-join {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  background: #1e88e5;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-join:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error-msg {
+  color: #ef5350;
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0;
+}
+
+/* Game screen */
+.game-screen {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.btn-back {
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.turn-label {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.room-code {
+  font-size: 0.85rem;
+  font-weight: 500;
+  opacity: 0.9;
+  letter-spacing: 0.15em;
+}
+
+.winner-msg {
+  color: #81c784;
+}
+
+.game-board-area {
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: min(90vw, 360px);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.board-wrap {
+  width: 100%;
+  height: 100%;
+}
+
+.board-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.game-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.dice-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.dice {
+  flex-shrink: 0;
+}
+
+.dice-label {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.btn-roll {
+  padding: 0.6rem 1.5rem;
+  border-radius: 10px;
+  border: none;
+  background: #1e88e5;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 140px;
+}
+
+.btn-roll:disabled {
+  background: rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+}
+
+.btn-new {
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  border: 2px solid #43a047;
+  background: transparent;
+  color: #81c784;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn-new:hover {
+  background: rgba(67, 160, 71, 0.2);
 }

@@ -35,6 +35,16 @@ Open the URL in the browser (and on your phone if on same Wi‑Fi).
 
 Connect this repo to Netlify; build command: `npm run build`, publish directory: `dist`.
 
+## Online multiplayer (Supabase)
+
+1. Create a project at [supabase.com](https://supabase.com).
+2. Run `supabase-setup.sql` in the SQL Editor (creates `rooms` table).
+3. In Dashboard → Database → Replication, enable Realtime for table `rooms`.
+4. Add env vars (Netlify: Site settings → Environment variables; local: `.env`):
+   - `VITE_SUPABASE_URL` = your project URL
+   - `VITE_SUPABASE_ANON_KEY` = your anon key
+5. Redeploy. "Play online" → Create game → share the 6-letter code → friends Join with that code.
+
 ## Project layout
 
 - `src/` — React app (game UI and logic).
