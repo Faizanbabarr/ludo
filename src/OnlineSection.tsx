@@ -3,7 +3,7 @@ import { Game } from './components/Game'
 import { useOnlineRoom } from './hooks/useOnlineRoom'
 import { createInitialState } from './utils/gameLogic'
 
-type Screen = 'menu' | 'local' | 'online' | 'online-create' | 'online-join' | 'game-local' | 'game-online'
+type Screen = 'splash' | 'loading' | 'home' | 'online' | 'online-create' | 'game-local' | 'game-online'
 
 interface OnlineSectionProps {
   screen: Screen
@@ -55,7 +55,7 @@ export function OnlineSection({ screen, setScreen }: OnlineSectionProps) {
           </button>
         </div>
         {online.error && <p className="error-msg">{online.error}</p>}
-        <button type="button" className="btn-back-inline" onClick={() => setScreen('menu')}>
+        <button type="button" className="btn-back-inline" onClick={() => setScreen('home')}>
           ← Back
         </button>
       </main>
@@ -69,7 +69,7 @@ export function OnlineSection({ screen, setScreen }: OnlineSectionProps) {
           numPlayers={4}
           onBack={() => {
             online.leaveRoom()
-            setScreen('menu')
+            setScreen('home')
           }}
           state={online.remoteState}
           setState={(s) => {
@@ -84,7 +84,7 @@ export function OnlineSection({ screen, setScreen }: OnlineSectionProps) {
     return (
       <main className="main menu">
         {online.loading ? <p>Creating room...</p> : online.error ? <p className="error-msg">{online.error}</p> : null}
-        <button type="button" className="btn-back-inline" onClick={() => setScreen('menu')}>
+        <button type="button" className="btn-back-inline" onClick={() => setScreen('home')}>
           ← Back
         </button>
       </main>

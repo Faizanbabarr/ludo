@@ -1,5 +1,5 @@
 :root {
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Fredoka', 'Segoe UI', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   color: rgba(255, 255, 255, 0.95);
@@ -8,18 +8,37 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Glass */
+  /* Purple theme - Ludo Star inspired */
+  --bg-primary: #4A1A6B;
+  --bg-secondary: #2D1045;
+  --bg-gradient: linear-gradient(160deg, #5B2D8E 0%, #4A1A6B 35%, #2D1045 100%);
+
+  /* Accent colors */
+  --gold: #FFD700;
+  --gold-dark: #B8860B;
+  --orange: #FF8C00;
+  --orange-dark: #FF5722;
+  --green-accent: #4CAF50;
+
+  /* Glass - adapted for purple */
   --glass-bg: rgba(255, 255, 255, 0.08);
-  --glass-border: rgba(255, 255, 255, 0.18);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   --glass-blur: 12px;
   --glass-radius: 16px;
   --glass-radius-sm: 12px;
 
-  /* Background - dark game feel */
-  --bg-start: #0f172a;
-  --bg-mid: #1e293b;
-  --bg-end: #0f172a;
+  /* Player colors */
+  --player-red: #E53935;
+  --player-green: #43A047;
+  --player-yellow: #FDD835;
+  --player-blue: #1E88E5;
+
+  /* Board */
+  --board-frame: #5D3A1A;
+  --board-frame-light: #8B6914;
+  --board-bg: #FFFDE7;
+  --board-cell-border: #BCAAA4;
 }
 
 *,
@@ -37,8 +56,8 @@ body {
   min-height: 100%;
   min-height: 100dvh;
   min-width: 320px;
-  background-color: #0f172a;
-  background-image: linear-gradient(160deg, var(--bg-start) 0%, var(--bg-mid) 45%, var(--bg-end) 100%);
+  background-color: #2D1045;
+  background-image: var(--bg-gradient);
   background-attachment: fixed;
   display: flex;
   align-items: center;
@@ -51,19 +70,19 @@ body {
   min-height: 100%;
   min-height: 100dvh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
 }
 
 a {
   font-weight: 500;
-  color: #93c5fd;
+  color: #d4a0ff;
   text-decoration: none;
 }
 
 a:hover {
-  color: #bfdbfe;
+  color: #e8c8ff;
 }
 
 button {
@@ -78,12 +97,12 @@ button {
 }
 
 button:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 button:focus,
 button:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline: 2px solid rgba(255, 215, 0, 0.5);
   outline-offset: 2px;
 }
 
