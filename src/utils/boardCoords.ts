@@ -1,97 +1,105 @@
 import type { PlayerId } from '../types/game'
 import { PATH_BASE, PATH_DONE, PATH_HOME_START, PATH_TRACK_END } from './ludoPath'
 
-const CX = 50
-const CY = 50
-const TRACK_R = 42
-const HOME_R = 8
+// 15x15 grid (0-14). Board inner rect in Board.tsx is x=14,y=14, width=72, height=72
+const INNER_LEFT = 14
+const INNER_TOP = 14
+const INNER_SIZE = 72
+const CELL = INNER_SIZE / GRID
 
-/** Angle for track index 0-51. Red start (0) at bottom. */
-function trackIndexToAngle(trackIndex: number): number {
-  return -90 + (trackIndex / 52) * 360
+function gridToSvg(col: number, row: number): { x: number; y: number } {
+  return {
+    x: INNER_LEFT + (col + 0.5) * CELL,
+    y: INNER_TOP + (row + 0.5) * CELL,
+  }
 }
 
-function angleToXY(angleDeg: number, r: number): { x: number; y: number } {
-  const rad = (angleDeg * Math.PI) / 180
-  return { x: CX + (r / 100) * 50 * Math.cos(rad), y: CY + (r / 100) * 50 * Math.sin(rad) }
-}
+/** Track index 0-51 -> (col, row) on 15x15 grid. 52-cell closed square path. */
+const TRACK_GRID: [number, number][] = [
+  // 0-12: bottom (1,6) to (13,6)
+  ...[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((c) => [c, 6] as [number, number]),
+  // 13-25: right (13,5) to (5,1)
+  ...[5, 4, 3, 2, 1].map((r) => [13, r] as [number, number]),
+  ...[12, 11, 10, 9, 8, 7, 6, 5].map((c) => [c, 1] as [number, number]),
+  // 26-38: top (8,5) to (13,12) — 13 cells
+  ...[5, 6, 7, 8].map((r) => [8, r] as [number, number]),
+  ...[9, 10, 11, 12].map((c) => [c, 8] as [number, number]),
+  [13, 8],
+  ...[9, 10, 11, 12].map((r) => [13, r] as [number, number]),
+  // 39-51: left (7,13) to (1,7) — 13 cells, then wraps to (1,6)
+  ...[7, 6, 5, 4, 3, 2, 1].map((c) => [c, 13] as [number, number]),
+  ...[12, 11, 10, 9, 8, 7].map((r) => [1, r] as [number, number]),
+]
 
-/** Path position 1-52 -> track index for player (for drawing we use global track index) */
+/** Path position 1-52 -> track index 0-51 for this player */
 function pathToTrackIndex(player: PlayerId, pathPos: number): number {
   const start = { 0: 0, 1: 13, 2: 26, 3: 39 }[player]
   return (start + pathPos - 1) % 52
 }
 
-/** Get (x, y) in 0-100 svg coords for a token. viewBox 0 100 100. */
+/** Get (x, y) in 0-100 SVG for a token */
 export function getTokenCoords(
   player: PlayerId,
   pathPosition: number,
   tokenOffset: number
 ): { x: number; y: number } {
-  const off = (tokenOffset - 1.5) * 2
+  const off = (tokenOffset - 1.5) * 1.8
   if (pathPosition === PATH_BASE) {
-    /* Base rects are at (16,51), (51,51), (51,16), (16,16) size 15 - centers below */
-    const baseCenters: Record<PlayerId, { x: number; y: number }> = {
-      0: { x: 23.5, y: 58.5 },
-      1: { x: 58.5, y: 58.5 },
-      2: { x: 58.5, y: 23.5 },
-      3: { x: 23.5, y: 23.5 },
+    // 4 cells per base: (col, row) for tokens 0..3
+    const baseCells: Record<PlayerId, [number, number][]> = {
+      0: [[0, 5], [1, 5], [0, 6], [1, 6]],
+      1: [[7, 0], [8, 0], [7, 1], [8, 1]],
+      2: [[12, 7], [13, 7], [12, 8], [13, 8]],
+      3: [[5, 12], [6, 12], [5, 13], [6, 13]],
     }
-    const half = 3.75
-    const baseOff: Record<PlayerId, { dx: number; dy: number }[]> = {
-      0: [{ dx: -half, dy: -half }, { dx: half, dy: -half }, { dx: -half, dy: half }, { dx: half, dy: half }],
-      1: [{ dx: -half, dy: -half }, { dx: half, dy: -half }, { dx: -half, dy: half }, { dx: half, dy: half }],
-      2: [{ dx: -half, dy: -half }, { dx: half, dy: -half }, { dx: -half, dy: half }, { dx: half, dy: half }],
-      3: [{ dx: -half, dy: -half }, { dx: half, dy: -half }, { dx: -half, dy: half }, { dx: half, dy: half }],
-    }
-    const c = baseCenters[player]
-    const d = baseOff[player][tokenOffset]
-    return { x: c.x + d.dx, y: c.y + d.dy }
+    const [col, row] = baseCells[player][tokenOffset]
+    return gridToSvg(col, row)
   }
   if (pathPosition === PATH_DONE) {
-    const homeCenters: Record<PlayerId, { x: number; y: number }> = {
-      0: { x: 50, y: 50 },
-      1: { x: 50, y: 50 },
-      2: { x: 50, y: 50 },
-      3: { x: 50, y: 50 },
-    }
-    const doneOff: Record<PlayerId, { dx: number; dy: number }[]> = {
-      0: [{ dx: 4, dy: 4 }, { dx: -4, dy: 4 }, { dx: 4, dy: -4 }, { dx: -4, dy: -4 }],
-      1: [{ dx: 4, dy: 4 }, { dx: -4, dy: 4 }, { dx: 4, dy: -4 }, { dx: -4, dy: -4 }],
-      2: [{ dx: 4, dy: 4 }, { dx: -4, dy: 4 }, { dx: 4, dy: -4 }, { dx: -4, dy: -4 }],
-      3: [{ dx: 4, dy: 4 }, { dx: -4, dy: 4 }, { dx: 4, dy: -4 }, { dx: -4, dy: -4 }],
-    }
-    const c = homeCenters[player]
-    const o = doneOff[player][tokenOffset]
-    return { x: c.x + o.dx, y: c.y + o.dy }
+    const doneOff: [number, number][] = [
+      [-0.4, -0.4], [0.4, -0.4], [-0.4, 0.4], [0.4, 0.4],
+    ]
+    const [dc, dr] = doneOff[tokenOffset]
+    return gridToSvg(7 + dc, 7 + dr)
   }
   if (pathPosition >= 1 && pathPosition <= PATH_TRACK_END) {
-    const trackIndex = pathToTrackIndex(player, pathPosition)
-    const angle = trackIndexToAngle(trackIndex)
-    const { x, y } = angleToXY(angle, TRACK_R)
-    const dx = off * Math.cos((angle * Math.PI) / 180)
-    const dy = off * Math.sin((angle * Math.PI) / 180)
-    return { x: x + dx, y: y + dy }
+    const ti = pathToTrackIndex(player, pathPosition)
+    const [col, row] = TRACK_GRID[ti]
+    const { x, y } = gridToSvg(col, row)
+    return { x: x + off, y: y + off }
   }
   if (pathPosition >= PATH_HOME_START && pathPosition < PATH_DONE) {
     const homeIndex = pathPosition - PATH_HOME_START
-    const angles: Record<PlayerId, number> = { 0: -90, 1: 0, 2: 90, 3: 180 }
-    const baseAngle = angles[player]
-    const homeAngle = baseAngle + (homeIndex + 1) * (90 / 6)
-    const r = TRACK_R - (homeIndex + 1) * (HOME_R * 2)
-    const { x, y } = angleToXY(homeAngle, r)
+    const homeCells: Record<PlayerId, [number, number][]> = {
+      0: [[7, 6], [7, 5], [7, 4], [7, 3], [7, 2]],
+      1: [[7, 7], [8, 7], [9, 7], [10, 7], [11, 7]],
+      2: [[7, 8], [7, 9], [7, 10], [7, 11], [7, 12]],
+      3: [[6, 7], [5, 7], [4, 7], [3, 7], [2, 7]],
+    }
+    const [col, row] = homeCells[player][homeIndex]
+    const { x, y } = gridToSvg(col, row)
     return { x: x + off * 0.8, y: y + off * 0.8 }
   }
-  return { x: 50, y: 50 }
+  return gridToSvg(7, 7)
 }
 
-/** Board SVG path for the track (center line) - for reference */
+/** SVG path for the main track (for drawing) */
 export function getTrackPath(): string {
-  const points: string[] = []
-  for (let i = 0; i <= 52; i++) {
-    const angle = trackIndexToAngle(i % 52)
-    const { x, y } = angleToXY(angle, TRACK_R)
-    points.push(`${x},${y}`)
+  const points = TRACK_GRID.map(([c, r]) => {
+    const { x, y } = gridToSvg(c, r)
+    return `${x},${y}`
+  })
+  return `M ${points.join(' L ')} Z`
+}
+
+/** Get grid positions for drawing the board (track cells, bases, home stretches) */
+export function getBoardLayout() {
+  const trackCells = TRACK_GRID.map(([c, r]) => ({ col: c, row: r }))
+  const bases: Record<PlayerId, { col: number; row: number; w: number; h: number }> = {
+    0: { col: 0, row: 5, w: 2, h: 2 },
+    1: { col: 7, row: 0, w: 2, h: 2 },
+    2: { col: 12, row: 7, w: 2, h: 2 },
+    3: { col: 5, row: 12, w: 2, h: 2 },
   }
-  return `M ${points.join(' L ')}`
+  return { trackCells, bases }
 }

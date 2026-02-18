@@ -1,7 +1,6 @@
 import type { GameState, PlayerId } from '../types/game'
 import { PLAYER_COLORS } from '../types/game'
-import { getTokenCoords } from '../utils/boardCoords'
-import { getTrackPath } from '../utils/boardCoords'
+import { getTokenCoords, getBoardLayout, getTrackPath } from '../utils/boardCoords'
 
 interface BoardProps {
   state: GameState
@@ -10,9 +9,15 @@ interface BoardProps {
   currentPlayer: PlayerId
 }
 
+const INNER_LEFT = 14
+const INNER_TOP = 14
+const INNER_SIZE = 72
+const CELL = INNER_SIZE / 15
+
 export function Board({ state, onTokenClick, validMoves }: BoardProps) {
   const size = 100
   const trackPath = getTrackPath()
+  const { bases } = getBoardLayout()
 
   return (
     <div className="board-wrap">
@@ -37,17 +42,17 @@ export function Board({ state, onTokenClick, validMoves }: BoardProps) {
           ))}
         </defs>
         <rect width={size} height={size} fill="#1a3d28" />
-        <rect x="14" y="14" width="72" height="72" rx="5" fill="url(#trackGrad)" stroke="rgba(74, 222, 128, 0.25)" strokeWidth="1" filter="url(#boardShadow)" />
+        <rect x={INNER_LEFT} y={INNER_TOP} width={INNER_SIZE} height={INNER_SIZE} rx="5" fill="url(#trackGrad)" stroke="rgba(74, 222, 128, 0.25)" strokeWidth="1" filter="url(#boardShadow)" />
         <path d={trackPath} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
-        {/* Home bases - corners */}
-        {[
-          { x: 16, y: 51, color: PLAYER_COLORS[0] },
-          { x: 51, y: 51, color: PLAYER_COLORS[1] },
-          { x: 51, y: 16, color: PLAYER_COLORS[2] },
-          { x: 16, y: 16, color: PLAYER_COLORS[3] },
-        ].map((b, i) => (
-          <rect key={i} x={b.x} y={b.y} width="15" height="15" rx="3" fill={b.color} opacity="0.45" stroke="rgba(255,255,255,0.2)" strokeWidth="0.4" />
-        ))}
+        {/* Home bases - corners (grid-aligned) */}
+        {(['0', '1', '2', '3'] as const).map((pid) => {
+          const b = bases[pid]
+          const x = INNER_LEFT + b.col * CELL
+          const y = INNER_TOP + b.row * CELL
+          return (
+            <rect key={pid} x={x} y={y} width={b.w * CELL} height={b.h * CELL} rx="3" fill={PLAYER_COLORS[Number(pid)]} opacity="0.45" stroke="rgba(255,255,255,0.2)" strokeWidth="0.4" />
+          )
+        })}
         {/* Tokens - with transition for smooth movement */}
         {state.players.map((player, pid) =>
           player.tokens.map((token, tid) => {
