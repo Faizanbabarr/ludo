@@ -64,7 +64,7 @@ const TRACK_GRID: [number, number][] = [
 ]
 
 /** Home stretch cells (5 cells leading toward center for each player) */
-const HOME_CELLS: Record<PlayerId, [number, number][]> = {
+const HOME_CELLS: Record<number, [number, number][]> = {
   0: [[1, 7], [2, 7], [3, 7], [4, 7], [5, 7]],       // Red: row 7, cols 1-5 (going right)
   1: [[7, 1], [7, 2], [7, 3], [7, 4], [7, 5]],       // Green: col 7, rows 1-5 (going down)
   2: [[13, 7], [12, 7], [11, 7], [10, 7], [9, 7]],   // Yellow: row 7, cols 13-9 (going left)
@@ -72,7 +72,7 @@ const HOME_CELLS: Record<PlayerId, [number, number][]> = {
 }
 
 /** Base token positions (4 tokens arranged in 2x2 within each 6x6 base) */
-const BASE_CELLS: Record<PlayerId, [number, number][]> = {
+const BASE_CELLS: Record<number, [number, number][]> = {
   0: [[1.5, 1.5], [3.5, 1.5], [1.5, 3.5], [3.5, 3.5]],         // Red: top-left
   1: [[10.5, 1.5], [12.5, 1.5], [10.5, 3.5], [12.5, 3.5]],     // Green: top-right
   2: [[10.5, 10.5], [12.5, 10.5], [10.5, 12.5], [12.5, 12.5]], // Yellow: bottom-right
@@ -81,7 +81,8 @@ const BASE_CELLS: Record<PlayerId, [number, number][]> = {
 
 /** Path position 1-52 -> track index 0-51 for this player */
 function pathToTrackIndex(player: PlayerId, pathPos: number): number {
-  const start = { 0: 0, 1: 13, 2: 26, 3: 39 }[player]
+  const startMap: Record<number, number> = { 0: 0, 1: 13, 2: 26, 3: 39 }
+  const start = startMap[player] ?? 0
   return (start + pathPos - 1) % 52
 }
 
@@ -119,7 +120,7 @@ export function getTokenCoords(
 
   if (pathPosition === PATH_DONE) {
     // Place done tokens in their player's home triangle
-    const triangleCenters: Record<PlayerId, [number, number]> = {
+    const triangleCenters: Record<number, [number, number]> = {
       0: [6.2, 7],    // Red: left triangle
       1: [7, 6.2],    // Green: top triangle
       2: [7.8, 7],    // Yellow: right triangle
@@ -152,7 +153,7 @@ export function getTokenCoords(
 export function getBoardLayout() {
   const trackCells = TRACK_GRID.map(([c, r]) => ({ col: c, row: r }))
 
-  const bases: Record<PlayerId, { col: number; row: number; w: number; h: number }> = {
+  const bases: Record<number, { col: number; row: number; w: number; h: number }> = {
     0: { col: 0, row: 0, w: 6, h: 6 },   // Red: top-left
     1: { col: 9, row: 0, w: 6, h: 6 },   // Green: top-right
     2: { col: 9, row: 9, w: 6, h: 6 },   // Yellow: bottom-right

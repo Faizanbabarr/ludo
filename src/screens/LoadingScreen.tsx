@@ -18,17 +18,8 @@ const PAWN_COLORS = ['#E53935', '#43A047', '#FDD835', '#1E88E5']
 export function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const [progress, setProgress] = useState(0)
   const [factIndex, setFactIndex] = useState(0)
+  const [showFact, setShowFact] = useState(true)
   const [fadeOut, setFadeOut] = useState(false)
-
-  const floatingPawns = useMemo(() =>
-    Array.from({ length: 8 }, (_, i) => ({
-      id: i,
-      color: PAWN_COLORS[i % 4],
-      left: `${8 + (i * 13) % 84}%`,
-      delay: `${i * 0.5}s`,
-      duration: `${3 + (i % 3)}s`,
-      size: 18 + (i % 3) * 6,
-    })), [])
 
   const sparkles = useMemo(() =>
     Array.from({ length: 15 }, (_, i) => ({
@@ -56,15 +47,31 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
     return () => clearInterval(interval)
   }, [onComplete])
 
+  // Crossfade fun facts
   useEffect(() => {
     const interval = setInterval(() => {
-      setFactIndex(i => (i + 1) % FUN_FACTS.length)
-    }, 2500)
+      setShowFact(false)
+      setTimeout(() => {
+        setFactIndex(i => (i + 1) % FUN_FACTS.length)
+        setShowFact(true)
+      }, 300)
+    }, 3000)
     return () => clearInterval(interval)
   }, [])
 
+  const p = Math.min(progress, 100)
+  // Ring progress: circumference of r=62 circle
+  const circumference = 2 * Math.PI * 62
+  const strokeOffset = circumference - (p / 100) * circumference
+
+  // Color transitions through player colors based on progress
+  const ringColor = p < 25 ? PAWN_COLORS[0]
+    : p < 50 ? PAWN_COLORS[1]
+    : p < 75 ? PAWN_COLORS[2]
+    : PAWN_COLORS[3]
+
   return (
-    <div className={`loading-screen ${fadeOut ? 'fade-out' : ''}`}>
+    <div className={`loading-screen ${fadeOut ? 'loading-exit' : ''}`}>
       {/* Sparkles */}
       <div className="loading-sparkles">
         {sparkles.map(s => (
@@ -83,79 +90,76 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
         ))}
       </div>
 
-      {/* Floating pawn silhouettes */}
-      <div className="loading-pawns-bg">
-        {floatingPawns.map(p => (
-          <div
-            key={p.id}
-            className="loading-floating-pawn"
-            style={{
-              left: p.left,
-              animationDelay: p.delay,
-              animationDuration: p.duration,
-            }}
-          >
-            <svg viewBox="0 0 32 44" width={p.size} height={p.size * 1.375}>
-              <ellipse cx="16" cy="41" rx="12" ry="3" fill={p.color} opacity="0.15" />
-              <rect x="4" y="36" width="24" height="5" rx="2.5" fill={p.color} opacity="0.5" />
-              <path
-                d={`M7,36 Q10,22 12,18 L20,18 Q22,22 25,36 Z`}
-                fill={p.color}
-                opacity="0.6"
-              />
-              <circle cx="16" cy="12" r="8" fill={p.color} opacity="0.7" />
-              <circle cx="14" cy="9" r="2.5" fill="rgba(255,255,255,0.3)" />
-            </svg>
-          </div>
-        ))}
-      </div>
-
       {/* Logo */}
       <h1 className="loading-logo">
         <span className="splash-logo-ludo">ROLL</span>
         <span className="splash-logo-star">HOME</span>
       </h1>
 
-      {/* Animated pawns circle */}
-      <div className="loading-pawn-orbit">
-        {PAWN_COLORS.map((color, i) => (
-          <div
-            key={i}
-            className="loading-orbit-pawn"
-            style={{
-              '--orbit-angle': `${i * 90}deg`,
-              '--orbit-color': color,
-            } as React.CSSProperties}
+      {/* 3D rotating board with circular progress ring */}
+      <div className="loading-3d-container">
+        {/* SVG progress ring */}
+        <svg className="loading-ring" viewBox="0 0 140 140">
+          {/* Background ring */}
+          <circle cx="70" cy="70" r="62" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="4" />
+          {/* Progress ring */}
+          <circle
+            cx="70" cy="70" r="62"
+            fill="none"
+            stroke={ringColor}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeOffset}
+            className="loading-ring-progress"
+            transform="rotate(-90 70 70)"
+          />
+          {/* Glow dot at progress end */}
+          <circle
+            cx="70" cy="8"
+            r="4"
+            fill={ringColor}
+            className="loading-ring-dot"
+            transform={`rotate(${(p / 100) * 360 - 90} 70 70)`}
+            opacity={p > 2 ? 1 : 0}
           >
-            <svg viewBox="0 0 24 34" width="28" height="38">
-              <rect x="4" y="28" width="16" height="4" rx="2" fill={color} />
-              <path d="M6,28 Q8,18 9,14 L15,14 Q16,18 18,28 Z" fill={color} />
-              <circle cx="12" cy="9" r="6" fill={color} />
-              <circle cx="10.5" cy="7" r="1.8" fill="rgba(255,255,255,0.35)" />
-            </svg>
-          </div>
-        ))}
+            <animate attributeName="r" values="3;5;3" dur="1.5s" repeatCount="indefinite" />
+          </circle>
+        </svg>
+
+        {/* 3D spinning mini board */}
+        <div className="loading-3d-board">
+          <svg viewBox="0 0 80 80" width="80" height="80">
+            <rect x="0" y="0" width="80" height="80" rx="6" fill="#FFFDE7" stroke="#8B6914" strokeWidth="2.5" />
+            <rect x="0" y="0" width="32" height="32" rx="3" fill="#E53935" opacity="0.75" />
+            <rect x="48" y="0" width="32" height="32" rx="3" fill="#43A047" opacity="0.75" />
+            <rect x="0" y="48" width="32" height="32" rx="3" fill="#1E88E5" opacity="0.75" />
+            <rect x="48" y="48" width="32" height="32" rx="3" fill="#FDD835" opacity="0.75" />
+            <rect x="32" y="32" width="16" height="16" rx="2" fill="#FFD700" opacity="0.6" />
+            {/* Mini pawns */}
+            <circle cx="16" cy="16" r="4" fill="white" opacity="0.7" />
+            <circle cx="64" cy="16" r="4" fill="white" opacity="0.7" />
+            <circle cx="16" cy="64" r="4" fill="white" opacity="0.7" />
+            <circle cx="64" cy="64" r="4" fill="white" opacity="0.7" />
+          </svg>
+        </div>
+
+        {/* Percentage text */}
+        <span className="loading-percent-center">{Math.round(p)}%</span>
       </div>
 
-      {/* Progress bar */}
-      <div className="loading-progress-container">
-        <div className="loading-bar-bg">
-          <div
-            className="loading-bar-fill"
-            style={{ width: `${Math.min(progress, 100)}%` }}
-          />
-          <span className="loading-percent">{Math.round(Math.min(progress, 100))}%</span>
-        </div>
-        <p className="loading-text-below">
-          {progress < 100 ? 'Preparing the board...' : 'Ready!'}
-        </p>
-      </div>
+      {/* Status text */}
+      <p className="loading-status">
+        {p < 100 ? 'Preparing the board...' : 'Ready!'}
+      </p>
+
+      {/* Fun fact with crossfade */}
+      <p className={`loading-fact ${showFact ? 'loading-fact-show' : 'loading-fact-hide'}`}>
+        {FUN_FACTS[factIndex]}
+      </p>
 
       {/* Branding */}
       <p className="loading-brand">By MarketingBuckle</p>
-
-      {/* Fun fact */}
-      <p className="loading-fact" key={factIndex}>{FUN_FACTS[factIndex]}</p>
     </div>
   )
 }

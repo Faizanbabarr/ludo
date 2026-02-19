@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react'
+import { getSoundEnabled, getVibrationEnabled } from '../utils/shop'
 
 export function useSound() {
   const ctxRef = useRef<AudioContext | null>(null)
@@ -54,7 +55,21 @@ export function useSound() {
     source.stop(ctx.currentTime + delay + duration)
   }, [getCtx])
 
-  const play = useCallback((name: 'roll' | 'move' | 'capture' | 'win') => {
+  const play = useCallback((name: 'roll' | 'move' | 'capture' | 'win' | 'snake' | 'ladder') => {
+    if (!getSoundEnabled()) {
+      // Still allow vibration if enabled
+      if (getVibrationEnabled() && typeof navigator !== 'undefined' && navigator.vibrate) {
+        switch (name) {
+          case 'roll': navigator.vibrate(30); break
+          case 'move': navigator.vibrate(15); break
+          case 'capture': navigator.vibrate([20, 30, 20]); break
+          case 'win': navigator.vibrate([50, 30, 50]); break
+          case 'snake': navigator.vibrate([40, 20, 40, 20, 60]); break
+          case 'ladder': navigator.vibrate([20, 10, 20, 10, 20]); break
+        }
+      }
+      return
+    }
     try {
       switch (name) {
         case 'roll':
@@ -93,18 +108,38 @@ export function useSound() {
           playTone(1568, 0.5, 'triangle', 0.04, 0.65)
           break
         }
+
+        case 'snake': {
+          // Snake: descending chromatic slide
+          const snakeFreqs = [600, 500, 400, 300, 200]
+          snakeFreqs.forEach((freq, i) => {
+            playTone(freq, 0.12, 'sawtooth', 0.07, i * 0.06)
+          })
+          break
+        }
+
+        case 'ladder': {
+          // Ladder: ascending bright climb
+          const ladderFreqs = [400, 500, 600, 700, 800]
+          ladderFreqs.forEach((freq, i) => {
+            playTone(freq, 0.1, 'triangle', 0.08, i * 0.06)
+          })
+          break
+        }
       }
     } catch {
       // Silently fail if audio not available
     }
 
     // Vibration feedback
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+    if (getVibrationEnabled() && typeof navigator !== 'undefined' && navigator.vibrate) {
       switch (name) {
         case 'roll': navigator.vibrate(30); break
         case 'move': navigator.vibrate(15); break
         case 'capture': navigator.vibrate([20, 30, 20]); break
         case 'win': navigator.vibrate([50, 30, 50]); break
+        case 'snake': navigator.vibrate([40, 20, 40, 20, 60]); break
+        case 'ladder': navigator.vibrate([20, 10, 20, 10, 20]); break
       }
     }
   }, [playTone, playNoise])
